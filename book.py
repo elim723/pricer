@@ -22,18 +22,17 @@ class Book (object):
         
         ''' initialize a book instance
 
-            :type  targetsize: int
-            :param targetsize: the number of shares
+            :param targetsize (int): the number of shares
 
-            :type  verbose: int
-            :param verbose: If 0, no print out on screen
-                            If 1, print info as it goes
+            :param verbose (int): If 0, no print out on screen
+                                  If 1, print info as it goes
         '''
 
         self._targetsize = targetsize
         self._verbose = verbose
 
         ## keep track of bids / asks
+        ## and money exchange in the market
         self._orders  = {}
         self._income  = {'old':None, 'new':None}
         self._expanse = {'old':None, 'new':None}
@@ -59,10 +58,9 @@ class Book (object):
 
         ''' a statist method to decode a string
 
-            :type  value: a unicode string
-            :param value: string to be decoded
+            :param value (unicode): string to be decoded
 
-            :return value: a decoded string
+            :return value (str): decoded string
         '''
 
         try:
@@ -78,39 +76,34 @@ class Book (object):
 
     def available (self, side):
 
-        ''' get current available shares
-            from either sellers or buyers
+        ''' get current available shares from either sellers or buyers
 
-            :type  side: string
-            :param side: either 'B' or 'S'
+            :param side (str): either 'B' for buy or 'S' for sell
 
-            :return sum: an int
-                       : If 'S', check total available shares to be sold
-                         If 'B', check total available shares to be bought
+            :return sum (int): If 'S', total available shares to be sold
+                               If 'B', total available shares to be bought
         '''
 
         return int (sum ([ self._orders[order]['size']
                            for order in self._orders
                            if self._orders[order]['side'] == side]))
 
-    def action (self, sell=False, buy=False):
+    def exchange (self, sell=False, buy=False):
 
-        ''' calculate $$ when action happens, either sell
+        ''' calculate $$ when an exchange happens, either sell
             or buy can happen.
 
             If both sell and buy are the same, return None.
+            This function only deals with one exchange.
 
-            :type  sell: a boolean
-            :param sell: If True, sell shares.
- 
-            :type  buy: a boolean
-            :param buy: If True, buy shares.
+            :param sell (bool): If True, sell shares.
+            :param buy  (bool): If True, buy shares.
 
-            :return exchange: a float
-                            : either income (sell) or expanse (buy)
+            :return exchange (float): either income (sell) or expanse (buy)
         '''
 
         ## if either sell nor buy, return None
+        ## (only one exchange is dealt here)
         if sell == buy: return None
 
         ## step 1: define variables given sell or buy
@@ -127,154 +120,185 @@ class Book (object):
         ## step 3: calculate income / expanse
         nsize, exchange = 0, 0.
         for order, info in orders:
-            # share to sell to this buyer
+            # share to sell to this buyer or to buy from this seller
             size = min (info['size'], self._targetsize - nsize) 
             # $$ from the size and price
             exchange += size * info['price']
             # update available size left
             nsize += size 
+            # print 
+            self._print_calculation (order, info, size, nsize)
             # break when greater than targetsize
             if nsize >= self._targetsize: break
 
-        ## step 4: print info
-        self._print_info (msg, exchange)
+        ## step 4: print SOLD / BOUGHT at what value
+        self._print_exchange (msg, exchange)
         return exchange
+
+    def action (self):
+
+        ''' perform selling / buying when needed
+            update income / expanse as it goes
+
+            :return updated_income  (bool): If True, self._income is updated
+            :return updated_expanse (bool): If True, self._expanse is updated
+        '''
+
+        ## if total order from buyer >= targetsize, sell!
+        income = self.exchange (sell=self.available ('B') >= self._targetsize, buy=False)
+        ## if total order from seller >= targetsize, buy!
+        expanse = self.exchange (sell=False, buy=self.available ('S') >= self._targetsize)
+
+        ## update if income / expanse are changed from before
+        updated_income = self._update ('income', income)
+        updated_expanse = self._update ('expanse', expanse)
+        return updated_income, updated_expanse
 
     def add_order (self, order, side, price, size):
 
         ''' add an order to the book
     
-            :type  order: a string
-            :param order: a unique string that subsequent
-                          'Reduce Order' messages will use
-                          to modify this order
+            :param order (str)  : a unique string that subsequent 'Reduce Order'
+                                  messages will use to modify this order
 
-            :type  side: a string
-            :param side: a 'B' if this is a buy order (a bid)
-                         a 'S' if this is a sell order (an ask)
+            :param side  (str)  : a 'B' if this is a buy  order (a bid)
+                                  a 'S' if this is a sell order (an ask)
         
-            :type  price: float
-            :param price: the limit price of this order
+            :param price (float): the limit price of this order
         
-            :type  size: int
-            :param size: size in shares of this order, when
-                         it was initially sent to the market
-                         by some stock trader
+            :param size  (int)  : size in shares of this order, when it was
+                                  initially sent to the market by some stock trader
 
-            :return income: float
-                          : total income from selling
+            :return updated_income  (bool): If True, income is updated by this order
 
-            :return expanse: float
-                           : total expanse from buying
+            :return updated_expanse (bool): If True, expanse is updated by this order
         '''
 
-        self._print_new_header ('order')
+        self._print_header ('order')
         ## add order
         self._orders[order] = {'side':side, 'price':self.decode (price),
                                'size':self.decode (size)}
-        ## print current available shares to buy / sell
-        self._print_current ()
-        ## if total order from buyer >= targetsize, sell!
-        income = self.action (sell=self.available ('B') >= self._targetsize, buy=False)
-        ## if total order from seller >= targetsize, buy!
-        expanse = self.action (sell=False, buy=self.available ('S') >= self._targetsize)
-        ## check if income / expanse are changed from before
-        return self.check_update (income, expanse)
+        ## print current available shares
+        self._print_current_shares ()
+        ## perform any action after the order is added
+        updated_income, updated_expanse = self.action ()
+        return updated_income, updated_expanse
 
     def reduce_order (self, order, size):
 
         ''' reduce an order from a book
 
-            :type  order: a string
-            :param order: a unique string that identifies
-                          the order to be reduced.
+            :param order (str): a unique string that identifies
+                                the order to be reduced.
 
-            :type  size: int
-            :param size: amount by which to reduce the size
-                         of the order. This is not the new
-                         size of the order. If size is equal
-                         to or greater than the existing size
-                         of the order, the order is removed
-                         from the book.
+            :param size  (int): amount by which to reduce the size of the order. This
+                                is not the new size of the order. If size is equal to
+                                or greater than the existing size of the order, the
+                                order is removed from the book.
+
+            :return updated_income  (bool): If True, income is updated by this order
+
+            :return updated_expanse (bool): If True, expanse is updated by this order
         '''
 
-        self._print_new_header ('reduce')
+        self._print_header ('reduce')
         ## reduce order by the given size
         self._orders[order]['size'] -= float (self.decode (size))
         ## remove from the book if nothing left
         if self._orders[order]['size'] <= 0.:
             del self._orders[order]
-        ## print current status
-        self._print_current ()
-        return 
+        ## print current available shares
+        self._print_current_shares ()
+        ## perform any action after the order is added
+        updated_income, updated_expanse = self.action ()
+        return updated_income, updated_expanse
 
-    def check_update (self, income, expanse):
+    def _update (self, exchangetype, exchange):
 
         ''' check if income / expanse is updated
             update internal self._income/_expanse
 
-            :type  income: float
-            :param income: $$ earned via selling
+            :param exchangetype (str)  : either 'income' or 'expanse'
+            :param exchange     (float): $$ either income or expanse
 
-            :type  expanse: float
-            :param expanse: $$ gone via buying
-
-            :return print_income: a boolean
-                                : If True, print S in outfile
-
-            :return print_expanse: a boolean
-                                 : If True, print B in outfile
+            :return print_exchange (bool): If True, exchangetype is
+                                           updated and print = True
         '''
 
-        print_income, print_expanse = False, False
-        if not expanse == self._expanse['new']:
-            self._expanse['old'] = deepcopy (self._expanse['new'])
-            self._expanse['new'] = expanse
-            print_expanse = True
+        ## default = nothing is changed
+        print_exchange = False
+        ## define the variable to be changed based on income / expanse
+        container = eval ('self._' + exchangetype)
+        ## check if current exchange is the same as before
+        same = exchange == container['new']
+        ## double check if they are the same after rounding
+        ## (this extra step needed if both current and new are not None
+        if exchange and container['new']:
+            same = round (exchange, 10) == round (container['new'], 10)
+        ## update if not the same
+        if not same:
+            # move 'new' value to old
+            container['old'] = deepcopy (container['new'])
+            # replace 'new' value to current value
+            container['new'] = exchange
+            # flag: this value is changed
+            print_exchange = True
+            # print what is being updated to what value
+            self._print_update (exchangetype, container)
+        return print_exchange
 
-        if not income == self._income['new']:
-            self._income['old'] = deepcopy (self._income['new'])
-            self._income['new'] = income
-            print_income = True
-        return print_income, print_expanse
+    def _print_update (self, exchangetype, container):
 
-    def _print_current (self):
+        ''' print what is updated to what value '''
+
+        if self._verbose:
+            print ('#### {0} is updated !!!'.format (exchangetype))
+            print ('####     from {0} ...'.format (container['old']))
+            print ('####     to   {0} ...'.format (container['new']))
+
+    def _print_calculation (self, order, info, size, nsize):
+
+        ''' print information of a given order in a given exchange '''
+        
+        if self._verbose:
+            print ('#### +---- {0}'.format (order))
+            print ('####     --- info size, price: {0}, {1}'.format (info['size'], info['price']))
+            print ('####     --- size can be sold/bought: {0}'.format (size))
+            print ('####     --- nsize: {0}'.format (nsize))
+
+    def _print_current_shares (self):
 
         ''' print current available shares to sell and buy '''
 
         if self._verbose:
             print ('#### current orders:')
             for order in self._orders:
-                print ('#### {0}: {1}'.format (order, self._orders[order]))
+                print ('####     {0}: {1}'.format (order, self._orders[order]))
             print ('####')
             print ('#### current available to sell from buyers: {0}'.format (self.available ('B')))
             print ('#### current available to buy from sellers: {0}'.format (self.available ('S')))
             print ('####')
-            
-    def _print_new_header (self, head):
+            print ('#### current old, new self._income : {0}, {1}'.format (self._income['old'],
+                                                                           self._income['new'] ))
+            print ('#### current old, new self._expanse: {0}, {1}'.format (self._expanse['old'],
+                                                                           self._expanse['new'] ))
+            print ('####')
+        
+    def _print_header (self, head):
 
-        ''' print the header given an action
-            (buying or selling) happens
-
-            :type  head: a string
-            :param head: either 'order' for adding order
-                         or 'reduce' for reducing order
-        '''
+        ''' print the header given a line of data '''
 
         if self._verbose:
             print ('##################################')
             print ('########## new {0:6} ############'.format (head))
             print ('####')
 
-    def _print_info (self, msg, money):
+    def _print_exchange (self, msg, money):
 
-        ''' print the income / expanse of one action
+        ''' print the income / expanse of a given exchange
     
-            :type  msg: a string
-            :param msg: either 'SOLD' or 'BOUGHT'
-
-            :type  money: a float
-            :param money: either income or expanse
+            :param msg   (str)  : either 'SOLD' or 'BOUGHT'
+            :param money (float): either income or expanse
         '''
 
         if self._verbose:
