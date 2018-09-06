@@ -16,6 +16,7 @@ Option 1
 --------
 
 >> elims $ bash pricer.sh
+
 target size 1 : differences between Elim and correct outputs = 0
 target size 200 : differences between Elim and correct outputs = 0
 target size 10000 : differences between Elim and correct outputs = 0
@@ -45,9 +46,7 @@ file `Pricer/elim200.out`.
 Option 3
 --------
 
->> elims $python pricer_python_standalone.py --targetsize 200 --verbose 0
-                                            (--maxrows -1 for processing all rows)
-                                            (--test if use test file)
+>> elims $python pricer_python_standalone.py --targetsize 200 --verbose 0 --maxrows -1 (--test if use test file)
 
 This is the most originated version that gives
 the correct logic (done by 09/04/2018). This
