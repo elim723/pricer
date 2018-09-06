@@ -6,13 +6,18 @@
 #### This script runs the pricer.py solution for
 #### the Kinetica job application assignment.
 ####
-#### This script requires a python 3.X.
+#### This script requires a python 3.X. and the
+#### following standard python packages:
+####  optparse, os, sys, gzip, time
+#### and a class `Book` from book.py
 ####
 #### command to run this script:
 ####
-#### $ python3 pricer.py --targetsize 200
-####                     --verbose 0
-####                    (--test if use test file)
+#### $ python pricer.py --targetsize 200
+####                    --verbose 0
+####    < cat <input filename>
+#### OR
+#### $ cat <input filename> | python pricer.py
 ####
 ###########################################
 
@@ -21,7 +26,7 @@
 ###########################################
 from optparse import OptionParser
 from book import Book
-import os, gzip, time
+import os, sys, gzip, time
 
 ###########################################
 ### parse options 
@@ -32,13 +37,11 @@ parser.add_option ('--targetsize', type='int', default=200,
                    help = "number of shares to keep track of.")
 parser.add_option ('--verbose', type='int', default=0,
                    help = "If 0, no print out; If 1, print details")
-parser.add_option ('--test', action='store_true', default=False,
-                   help = "If --test, use test input file instead")
 (options, args) = parser.parse_args ()
 
 targetsize = options.targetsize
-verbose    = options.verbose
-test       = options.test
+verbose    = options.verbose     
+lines      = args
 
 ###########################################
 ### define variables
@@ -47,46 +50,44 @@ test       = options.test
 thisdir = os.path.dirname (os.path.abspath (__file__)) + '/'
 
 ###########################################
-### function to load input file
-###########################################
-def load_input ():
-    ## define input files
-    infile  = 'Pricer/test.in.gz' if test else \
-              'Pricer/pricer.in.gz'
-    ## read infile - pricer.in.gz
-    with gzip.open (infile, 'rb') as f:
-        intxt = f.read ()
-    f.close ()
-    ## return individual lines in a list
-    return intxt.decode ('utf-8').split ('\n')
-
-###########################################
 ### function to process each line
 ###########################################
 def process (*data):
 
     ''' process a line of data
 
-        :type  data: list of information
-        :param data: (timestamp, add, order, side, price, size) or
-                     (timestamp, reduce, order, size)
+        :param data (list): [timestamp, add, order, side, price, size] or
+                            [timestamp, reduce, order, size]
 
-        :return outline: a string
-                outline: If None, no action
-                         If not None, action happens
+        :return message (str): If None, income / expanses remain the same
+                               If not None, income / expanses is/are updated
+                                            message print to outfile
     '''
 
+    ## first two columns (timestamp and A/R) are ignored
+    ## data with 4 elements -> reduce order
+    ## data with 6 elements -> add order
     length, args = len (data), data[2:]
-    message = None
+    ## data has only 4 or 6 elements
+    ## ignore invalid line
+    if not length in [4, 6]: return None
+
+    ## print the given line of data
+    if verbose: print ('data: {0}'.format (data))
+
     if length == 6:
+        ## data with 6 elements -> add order
+        ## *args has 4 elements
         print_income, print_expanse = book.add_order (*args)
-        message = get_message (data[0].decode ('utf-8'),
-                               print_S=print_income,
-                               print_B=print_expanse)
     elif length == 4:
-        book.reduce_order (*args) 
-    else:
-        print ("invalid line: {0}".format (data))
+        ## data with 4 elements -> reduce order
+        ## *args has 2 elements
+        print_income, print_expanse = book.reduce_order (*args)
+
+    ## get message (None if nothing is updated
+    message = get_message (data[0].decode ('utf-8'),
+                           print_S=print_income,
+                           print_B=print_expanse)
     return message
 
 ###########################################
@@ -94,10 +95,27 @@ def process (*data):
 ###########################################
 def get_message (timestamp, print_S=False, print_B=False):
 
+    ''' obtain message for output file if print_S or print_B
+
+        :param timestamp (str) : time when income/expanse is updated
+        :param print_S   (bool): If True, seller sells! Income is updated
+        :param print_B   (bool): If True, buyer buys! Expanse is updated
+
+        :return message (str): message to be printed in output file
+    '''
+    
+    ## if either income / expanse is updated,
+    ## nothing to be printed
     if not print_S and not print_B: return None
+    ## print whether action from a 'S'eller or a 'B'uyer
     E = 'S' if print_S else 'B'
+    ## get the updated values of money exchange (income / expanse)
     exchange = book.income if print_S else book.expanse
-    return ' '.join ([timestamp, E, str (exchange), '\n'])
+    ## if the value is changed to None, print 'NA'
+    ## else the value has two decimal points
+    exchange = 'NA' if exchange==None else '{:.2f}'.format (exchange) 
+    ## print the array in one string
+    return ' '.join ([timestamp, E, exchange, '\n'])
 
 ###########################################
 ### execution :)
@@ -105,24 +123,30 @@ def get_message (timestamp, print_S=False, print_B=False):
 if __name__ == '__main__' :
 
     ## define output file
-    outfile = thisdir + 'Pricer/elimtest.out' if test else \
-              thisdir + 'Pricer/elim.out'
+    outfile = thisdir + 'Pricer/elim.out'
 
     ## initialize a book instance
     book = Book (targetsize=targetsize,
                  verbose=verbose)
 
+    ## start timer
+    start_time = time.time ()
+
     ## open outfile
     with open (outfile, 'wb') as f:
         
         ## loop through each input line
-        for line in load_input ():
+        for line in sys.stdin:
             # get data from current line
             data = line.split (' ')
             message = process (*data)
-
             # write message to new line if updated
-            if message: f.write (message)
+            if message:
+                f.write (message)
 
     ## close outfile
     f.close ()
+
+    ## end timer
+    dtime = (time.time () - start_time) / 60.
+    print ('This script took {0} minuites to complete the task.'.format (dtime))
