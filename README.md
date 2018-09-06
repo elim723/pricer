@@ -15,12 +15,10 @@ options use the same logic.
 Option 1
 --------
 
-++-----------------------------------------------------------------------
 ++ elims $ bash pricer.sh
 ++ target size 1 : differences between Elim and correct outputs = 0
 ++ target size 200 : differences between Elim and correct outputs = 0
 ++ target size 10000 : differences between Elim and correct outputs = 0
-++-----------------------------------------------------------------------
 
 This option assumes that pricer.in is located in
 Pricer/. This bash script also automatically runs
