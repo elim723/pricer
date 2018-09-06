@@ -15,9 +15,14 @@
 ####
 #### $ python pricer.py --targetsize 200
 ####                    --verbose 0
+<<<<<<< HEAD
 ####    < cat <input filename>
 #### OR
 #### $ cat <input filename> | python pricer.py
+=======
+####                   (--maxrows -1 for processing all rows)
+####                   (--test if use test file)
+>>>>>>> 474ec0ad3ce8fa4a284b78dca64a6728999da3a1
 ####
 ###########################################
 
@@ -37,11 +42,24 @@ parser.add_option ('--targetsize', type='int', default=200,
                    help = "number of shares to keep track of.")
 parser.add_option ('--verbose', type='int', default=0,
                    help = "If 0, no print out; If 1, print details")
+<<<<<<< HEAD
 (options, args) = parser.parse_args ()
 
 targetsize = options.targetsize
 verbose    = options.verbose     
 lines      = args
+=======
+parser.add_option ('--maxrows', type='int', default=-1,
+                   help = "maximum number of lines to process. -1 for all lines.")
+parser.add_option ('--test', action='store_true', default=False,
+                   help = "If --test, use test input file instead")
+(options, args) = parser.parse_args ()
+
+targetsize = options.targetsize
+verbose    = options.verbose
+maxrows    = options.maxrows
+test       = options.test
+>>>>>>> 474ec0ad3ce8fa4a284b78dca64a6728999da3a1
 
 ###########################################
 ### define variables
@@ -50,6 +68,33 @@ lines      = args
 thisdir = os.path.dirname (os.path.abspath (__file__)) + '/'
 
 ###########################################
+<<<<<<< HEAD
+=======
+### function to load input file
+###########################################
+def load_input ():
+
+    ''' load the input file '''
+
+    ## define input files
+    infile  = 'Pricer/test.in.gz' if test else \
+              'Pricer/pricer.in.gz'
+
+    try:
+        ## try to open the infile
+        ## read infile - pricer.in.gz
+        with gzip.open (infile, 'rb') as f:
+            intxt = f.read ()
+        f.close ()
+        ## return individual lines in a list
+        return intxt.decode ('utf-8').split ('\n')
+    except IOError:
+        ## no infile is found .. print error message
+        print ('unable to read file: {0}'.format (infile))
+        sys.exit()
+
+###########################################
+>>>>>>> 474ec0ad3ce8fa4a284b78dca64a6728999da3a1
 ### function to process each line
 ###########################################
 def process (*data):
@@ -134,15 +179,34 @@ if __name__ == '__main__' :
 
     ## open outfile
     with open (outfile, 'wb') as f:
-        
+
+        ## get all available lines
+        lines = load_input ()        
+        ## keep track of number of lines
+        nlines = 0
+        ## if maxrows is -1, read all lines
+        if maxrows==-1: maxrows = len (lines) 
+
         ## loop through each input line
+<<<<<<< HEAD
         for line in sys.stdin:
+=======
+        for line in lines:
+>>>>>>> 474ec0ad3ce8fa4a284b78dca64a6728999da3a1
             # get data from current line
             data = line.split (' ')
             message = process (*data)
             # write message to new line if updated
+<<<<<<< HEAD
             if message:
                 f.write (message)
+=======
+            if message: f.write (message)
+            # count nline 
+            nlines += 1
+            # break when maxrows is reached
+            if nlines >= maxrows: break
+>>>>>>> 474ec0ad3ce8fa4a284b78dca64a6728999da3a1
 
     ## close outfile
     f.close ()
