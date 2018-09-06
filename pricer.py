@@ -8,7 +8,7 @@
 ####
 #### This script requires a python 3.X. and the
 #### following standard python packages:
-####  optparse, os, sys, time, copy
+####  optparse, sys, copy
 #### and a class `Book` from book.py
 ####
 #### command to run this script:
@@ -24,7 +24,7 @@
 ###########################################
 from optparse import OptionParser
 from book import Book
-import os, sys, time
+import sys
 
 ###########################################
 ### parse options 
@@ -35,14 +35,13 @@ parser.add_option ('--targetsize', type='int', default=200,
                    help = "number of shares to keep track of.")
 (options, args) = parser.parse_args ()
 
-targetsize = options.targetsize
-verbose    = 0
-
 ###########################################
 ### define variables
 ###########################################
-## this directory
-thisdir = os.path.dirname (os.path.abspath (__file__)) + '/'
+targetsize = options.targetsize
+## Verbose is turned off so that no printout
+## messages are piped to outfile.
+verbose    = 0
 
 ###########################################
 ### function to process each line
@@ -128,6 +127,4 @@ if __name__ == '__main__' :
         message = process (*data)
         
         # write message to new line if updated
-        if message:
-            #f.write (message)
-            print ('{0}'.format (message))
+        if message: print ('{0}'.format (message))

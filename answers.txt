@@ -17,7 +17,7 @@ The packages required for my solution come from the
 standard Python packages: optparse / os / sys / time,
 plus a class that I wrote specifically for this `Book`.
 
-Please refer to README.md Option 2 for my final program
+Please refer to README.md Option 1 for my final program
 to solve the problem.
 
 >>> We're looking for evidence that you can produce code that
@@ -116,16 +116,16 @@ is a Software Engineer in Python.
 >>> What is the time complexity for processing an
 >>> Add Order message?
 
-By eye-balling, adding an order takes ~ 1e-6 minuites. 
-As the data size increases, the time expected would
-increase as the number of added orders increases.
+Adding an order takes ~ 1e-6 minuites. As the data size
+increases, the time expected would increase as the number
+of added orders increases.
 
 >>> What is the time complexity for processing a
 >>> Reduce Order message?
 
-By eye-balling, reducing an order takes ~ 1e-6 minuites.
-As the data size increases, the time expected would
-increase as the number of reduced orders increases.
+Reducing an order takes ~ 1e-6 minuites. As the data size
+increases, the time expected would increase as the number
+of reduced orders increases.
 
 The time performance for reducing and adding an order
 is about the same because similar procedures are done:
