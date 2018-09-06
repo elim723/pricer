@@ -1,6 +1,14 @@
 This is Elim's solution to a job interview
 assignment `Pricer` by Kinetica.
 
+NOTE :: Given that Elim was given the task
+within the past 30 hours, she is able to get
+the logic and implementation working right.
+Elim has also provided an easy test against
+the provided answers given target sizes of 1,
+200, 10000. However, Elim is planning to
+write a unittest for this project. 
+
 There are three options to run `pricer`. All
 options use the same logic.
 
