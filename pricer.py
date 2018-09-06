@@ -45,30 +45,6 @@ verbose    = 0
 thisdir = os.path.dirname (os.path.abspath (__file__)) + '/'
 
 ###########################################
-### function to load input file
-###########################################
-def load_input ():
-
-    ''' load the input file '''
-
-    ## define input files
-    infile  = 'Pricer/test.in.gz' if test else \
-              'Pricer/pricer.in.gz'
-
-    try:
-        ## try to open the infile
-        ## read infile - pricer.in.gz
-        with gzip.open (infile, 'rb') as f:
-            intxt = f.read ()
-        f.close ()
-        ## return individual lines in a list
-        return intxt.decode ('utf-8').split ('\n')
-    except IOError:
-        ## no infile is found .. print error message
-        print ('unable to read file: {0}'.format (infile))
-        sys.exit()
-
-###########################################
 ### function to process each line
 ###########################################
 def process (*data):
