@@ -1,0 +1,154 @@
+This text file provides answers that Kinetica software
+experts asked in the problem.html.
+
+>>> Please write the Pricer program in one of C, C++, Java,
+>>> or Scala, and send us the source code. You do not need
+>>> to send us any compiler output. We encourage you to take
+>>> advantage of the language's standard libraries and latest
+>>> versions. Please do not use other code that you would have
+>>> to download separately from your chosen language's normal
+>>> distribution package.
+
+This folder contains all the codes needed to answer the
+problem.html. Given that the position I am applying for
+is a Python engineer, the software are written in Python.
+
+The packages required for my solution come from the
+standard Python packages: optparse / os / sys / time,
+plus a class that I wrote specifically for this `Book`.
+
+Please refer to README.md Option 2 for my final program
+to solve the problem.
+
+>>> We're looking for evidence that you can produce code that
+>>> others would be able to understand, fix, and extend. At
+>>> the same time, we do have real-time requirements for
+>>> production code, so we frown on gratuitous inefficiency.
+>>> Here are some qualities we look for:
+
+>>> Correctness. Obviously, the fewer bugs you write,
+>>> the fewer you'll have to fix.
+
+To prove that my scripts return the right answers,
+I provided the `pricer.sh` (Option 1 in README.md).
+In particular, I used `sdiff` to count for number
+of differences between my solution output file to
+the answers provided by Kinetica. All three target
+sizes (1, 200, 10000) return 0 differences in lines,
+meaning no difference is found for the abvoe settings.
+
+>>> Clarity. If only you can understand your code,
+>>> then only you can maintain it. Good code speaks
+>>> for itself - a good programmer should be able to
+>>> understand your implementation details without
+>>> extensive comments.
+
+It is my habit to write comments as I code, as you
+can see from `book.py` and `pricer.py`. In particular,
+for each function, I wrote out what are the parameters
+(`: param` in types and meanings) I expected and what
+the output parameters are. For the "meat" in my code,
+I wrote out the steps that I processed in my brain so
+that whoever reads it later on can understand my logic.
+
+I am not a professional programmer, and these habits
+are developed from how I, as a software user, would
+want to know about a specific function.
+
+>>> Conciseness. The less code you write, the less
+>>> code your coworkers need to puzzle out.
+
+While explaining out my logic, I also tried to keep
+my conciseness. I often used comprehension to shrink
+the number of lines, and I avoid having multiple lines
+of the same codes. 
+
+>>> Coefficiency. OK, just efficiency, but wouldn't
+>>> it be cool if all of these qualities started with
+>>> a 'C'? Anyway, using less time and space is generally
+>>> better than otherwise.
+
+LOL 'C' is always better for sure! In general, it
+is my habit of keeping the code as short and less-
+multiplicated as possible. But I spend my time and
+space on comments and explanation so that I/users/
+developers can understand my logics later on.
+
+>>> Of course, there are often trade-offs between each
+>>> of these properties (except correctness, which is
+>>> pretty much an absolute).
+
+Agreed. There is no 'correct' answers. But, again,
+I try to keep the code short but explanation as long
+as it needs to be.
+
+>>> Also, we are a Linux shop and we like Unix-style
+>>> tools: programs that process the output of other
+>>> programs. So make sure your implementation of Pricer
+>>> is suitable for use in a shell pipeline. Follow the
+>>> I/O specifications: don't mix prompts in with your
+>>> output or demand that the input come from a disk file.
+
+The `pricer.py` is expected to be used using pipe. Here
+are the two options that `pricer.py` can be used:
+
+Option 1
+--------
+elims $ python pricer.py --targetsize 200 < cat Pricer/pricer.in > Pricer/elim200.out
+
+Option 2
+--------
+elims $ cat Pricer/pricer.in | python pricer.py --targetsize 200 > Pricer/elim200.out
+
+The first option uses `<` to feed the input textfile
+to pricer.py via stdin. The second option uses `|`,
+also via stdin. The `>` carrot directs the output
+messages to the Pricer/elim200.out file.
+
+>>> In addition to supplying us with your source code,
+>>> please answer these questions:
+
+>>> How did you choose your implementation language?
+
+I choose Python because the position I am applying for
+is a Software Engineer in Python.
+
+>>> What is the time complexity for processing an
+>>> Add Order message?
+
+By eye-balling, adding an order takes ~ 1e-6 minuites. 
+As the data size increases, the time expected would
+increase as the number of added orders increases.
+
+>>> What is the time complexity for processing a
+>>> Reduce Order message?
+
+By eye-balling, reducing an order takes ~ 1e-6 minuites.
+As the data size increases, the time expected would
+increase as the number of reduced orders increases.
+
+The time performance for reducing and adding an order
+is about the same because similar procedures are done:
+modifying current orders in the book, checking and
+performing any action (a sell / buy) done, and updating
+the income/expanse in the book.
+
+>>> If your implementation were put into production
+>>> and found to be too slow, what ideas would you
+>>> try out to improve its performance? (Other than
+>>> reimplementing it in a different language such
+>>> as C or C++.)
+
+One of the thing I learnt from this exercise is that
+the built-in `open ()` function in Python is slower
+than the `stdin` via bash directly. When using
+`open ()`, the script took ~ 7 minuites to complete
+the task, whereas, the same procedure took about
+3.5 minuites via stdin. Overall, the memory usage
+is ~ 19MB, which is not too bad.
+
+If I find it too slow lateron, I would first look
+for the parts in the processing that took the longest.
+I would then focus on what I care about and reduce
+the computation on things I don't care about.
+

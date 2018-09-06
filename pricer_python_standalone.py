@@ -13,8 +13,8 @@
 ####
 #### command to run this script:
 ####
-#### $ python pricer.py --targetsize 200
-####                    --verbose 0
+#### $ python pricer_python_standalone.py --targetsize 200
+####                                      --verbose 0
 ####                   (--maxrows -1 for processing all rows)
 ####                   (--test if use test file)
 ####
@@ -151,8 +151,8 @@ def get_message (timestamp, print_S=False, print_B=False):
 if __name__ == '__main__' :
 
     ## define output file
-    outfile = thisdir + 'Pricer/elimtest.out' if test else \
-              thisdir + 'Pricer/elim.out'
+    outfile = thisdir + 'Pricer/elimtest_standalone.out' if test else \
+              thisdir + 'Pricer/elim_standalone.out'
 
     ## initialize a book instance
     book = Book (targetsize=targetsize,

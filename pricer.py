@@ -8,7 +8,7 @@
 ####
 #### This script requires a python 3.X. and the
 #### following standard python packages:
-####  optparse, os, sys, gzip, time
+####  optparse, os, sys, time, copy
 #### and a class `Book` from book.py
 ####
 #### command to run this script:
@@ -17,9 +17,7 @@
 ####                    --verbose 0
 ####    < cat <input filename>
 #### OR
-#### $ cat <input filename> | python pricer.py
-####                   (--maxrows -1 for processing all rows)
-####                   (--test if use test file)
+#### $ cat <input filename> | python pricer.py --targetsize 200 --verbose 0
 ####
 ###########################################
 
@@ -28,7 +26,7 @@
 ###########################################
 from optparse import OptionParser
 from book import Book
-import os, sys, gzip, time
+import os, sys, time
 
 ###########################################
 ### parse options 
@@ -37,13 +35,10 @@ usage = "usage: %prog [--targetsize 200 --verbose 0 (--test)]"
 parser = OptionParser (usage=usage)
 parser.add_option ('--targetsize', type='int', default=200,
                    help = "number of shares to keep track of.")
-parser.add_option ('--verbose', type='int', default=0,
-                   help = "If 0, no print out; If 1, print details")
 (options, args) = parser.parse_args ()
 
 targetsize = options.targetsize
-verbose    = options.verbose     
-lines      = args
+verbose    = 0
 
 ###########################################
 ### define variables
@@ -141,38 +136,24 @@ def get_message (timestamp, print_S=False, print_B=False):
     ## else the value has two decimal points
     exchange = 'NA' if exchange==None else '{:.2f}'.format (exchange) 
     ## print the array in one string
-    return ' '.join ([timestamp, E, exchange, '\n'])
+    return ' '.join ([timestamp, E, exchange])
 
 ###########################################
 ### execution :)
 ###########################################
 if __name__ == '__main__' :
 
-    ## define output file
-    outfile = thisdir + 'Pricer/elim.out'
-
     ## initialize a book instance
     book = Book (targetsize=targetsize,
                  verbose=verbose)
 
-    ## start timer
-    start_time = time.time ()
-
-    ## open outfile
-    with open (outfile, 'wb') as f:
-
-        ## loop through each input line
-        for line in sys.stdin:
-            # get data from current line
-            data = line.split (' ')
-            message = process (*data)
-
-            # write message to new line if updated
-            if message: f.write (message)
-
-    ## close outfile
-    f.close ()
-
-    ## end timer
-    dtime = (time.time () - start_time) / 60.
-    print ('This script took {0} minuites to complete the task.'.format (dtime))
+    ## loop through each input line
+    for line in sys.stdin:
+        # get data from current line
+        data = line.split (' ')
+        message = process (*data)
+        
+        # write message to new line if updated
+        if message:
+            #f.write (message)
+            print ('{0}'.format (message))
