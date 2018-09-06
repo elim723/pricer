@@ -49,9 +49,10 @@ Option 3
 > elims $python pricer_python_standalone.py --targetsize 200 --verbose 0 --maxrows -1 (--test if use test file)
 
 This is the most originated version that gives
-the correct logic (done by 09/04/2018). This
+the correct logic (done by 09/03/2018). This
 script uses a python built-in `open ()` function
-instead of standard input (stdin) via bash. This
-version of `pricer.py` is the slowest (~ 7 min)
-to run the entire Pricer/pricer.in, whereas
-Option 2 took about 3 min for the same input.
+instead of standard input (stdin) via bash and
+takes the .gz as the input file instead of .out.
+This version of `pricer.py` is the slowest
+(about 7 min) to run the entire Pricer/pricer.in,
+whereas Option 2 took about 3 min for the same input.
