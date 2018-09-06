@@ -20,6 +20,7 @@ Option 1
 + target size 1 : differences between Elim and correct outputs = 0
 + target size 200 : differences between Elim and correct outputs = 0
 + target size 10000 : differences between Elim and correct outputs = 0
+
 +-----------------------------------------------------------------------
 
 This option assumes that pricer.in is located in
@@ -35,6 +36,7 @@ Option 2
 
 +------------------------------------------------------------------------
 + elims $ cat Pricer/pricer.in  | python pricer.py --targetsize 200 > Pricer/elim200.out
+
 +------------------------------------------------------------------------
 
 This option is the solution that the problem set
@@ -53,6 +55,7 @@ Option 3
 + python pricer_python_standalone.py --targetsize 200 --verbose 0
 +                                   (--maxrows -1 for processing all rows)
 +                                   (--test if use test file)
+
 +------------------------------------------------------------------------
 
 This is the most originated version that gives
