@@ -15,10 +15,10 @@ options use the same logic.
 Option 1
 --------
 
-++ elims $ bash pricer.sh
-++ target size 1 : differences between Elim and correct outputs = 0
-++ target size 200 : differences between Elim and correct outputs = 0
-++ target size 10000 : differences between Elim and correct outputs = 0
+>> elims $ bash pricer.sh
+target size 1 : differences between Elim and correct outputs = 0
+target size 200 : differences between Elim and correct outputs = 0
+target size 10000 : differences between Elim and correct outputs = 0
 
 This option assumes that pricer.in is located in
 Pricer/. This bash script also automatically runs
@@ -31,9 +31,7 @@ correct answer.
 Option 2
 --------
 
-++------------------------------------------------------------------------
-++ elims $ cat Pricer/pricer.in  | python pricer.py --targetsize 200 > Pricer/elim200.out
-++------------------------------------------------------------------------
+>> elims $ cat Pricer/pricer.in  | python pricer.py --targetsize 200 > Pricer/elim200.out
 
 This option is the solution that the problem set
 asks for. It uses bash I/O pipe to due with in and
@@ -47,11 +45,9 @@ file `Pricer/elim200.out`.
 Option 3
 --------
 
-++------------------------------------------------------------------------
-++ python pricer_python_standalone.py --targetsize 200 --verbose 0
-++                                   (--maxrows -1 for processing all rows)
-++                                   (--test if use test file)
-++------------------------------------------------------------------------
+>> elims $python pricer_python_standalone.py --targetsize 200 --verbose 0
+                                            (--maxrows -1 for processing all rows)
+                                            (--test if use test file)
 
 This is the most originated version that gives
 the correct logic (done by 09/04/2018). This
