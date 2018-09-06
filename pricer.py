@@ -13,11 +13,9 @@
 ####
 #### command to run this script:
 ####
-#### $ python pricer.py --targetsize 200
-####                    --verbose 0
-####    < cat <input filename>
+#### $ python pricer.py --targetsize 200 < cat <input filename> > outfile.log
 #### OR
-#### $ cat <input filename> | python pricer.py --targetsize 200 --verbose 0
+#### $ cat <input filename> | python pricer.py --targetsize 200 > outfile.log
 ####
 ###########################################
 
