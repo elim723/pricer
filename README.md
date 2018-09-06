@@ -15,23 +15,6 @@ options use the same logic.
 Option 1
 --------
 
->> elims $ bash pricer.sh
-
-target size 1 : differences between Elim and correct outputs = 0    \
-target size 200 : differences between Elim and correct outputs = 0  \
-target size 10000 : differences between Elim and correct outputs = 0 \
-
-This option assumes that pricer.in is located in
-Pricer/. This bash script also automatically runs
-all three target sizes (1, 200, 10k) and print out
-(`echo`) the differences between Elim's anwser and
-standard anwser by Kinetica. The `sdiff` comparison
-serves as a simple test between my answer and the
-correct answer.
-
-Option 2
---------
-
 >> elims $ cat Pricer/pricer.in  | python pricer.py --targetsize 200 > Pricer/elim200.out
 
 This option is the solution that the problem set
@@ -42,6 +25,23 @@ The python script took the infile as standard input
 (stdin), as well as the input targetsize of 200. The
 out messages are `carroted` (>) to a dedicated output
 file `Pricer/elim200.out`.
+
+Option 2
+--------
+
+>> elims $ bash pricer.sh
+
+target size 1 : differences between Elim and correct outputs = 0    \
+target size 200 : differences between Elim and correct outputs = 0  \
+target size 10000 : differences between Elim and correct outputs = 0 
+
+This option assumes that pricer.in is located in
+Pricer/. This bash script also automatically runs
+all three target sizes (1, 200, 10k) and print out
+(`echo`) the differences between Elim's anwser and
+standard anwser by Kinetica. The `sdiff` comparison
+serves as a simple test between my answer and the
+correct answer.
 
 Option 3
 --------
