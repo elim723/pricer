@@ -31,7 +31,7 @@ import os, sys, time
 ###########################################
 ### parse options 
 ###########################################
-usage = "usage: %prog [--targetsize 200 --verbose 0 (--test)]"
+usage = "usage: cat <infile> | %prog [--targetsize 200] > outfile.log"
 parser = OptionParser (usage=usage)
 parser.add_option ('--targetsize', type='int', default=200,
                    help = "number of shares to keep track of.")
