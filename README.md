@@ -1,58 +1,37 @@
-This is Elim's solution to a job interview
-assignment `Pricer` by Kinetica.
+This project is Elim's solution to a job interview assignment `Pricer` by Kinetica.
 
-NOTE :: Given that Elim was given the task
-within the past 30 hours, she is able to get
-the logic and implementation working right.
-Elim has also provided an easy test against
-the provided answers given target sizes of 1,
-200, 10000. However, Elim is planning to
-write a unittest for this project. 
+It is a very fun project. Elim had zero understanding in how bid/ask works before. Elim spent about 12 hours in total to complete this assignment which includes understanding and solving the given problem as well as implementing and testing my solutions. Further explanations to the questions addressed in `Pricer/problem.html` are explained in `answers.txt`.
 
-There are three options to run `pricer`. All
-options use the same logic.
+Solution Script
+---------------
 
-Option 1
---------
+My solution to the problem is a python script `pricer.py` which took a `targetsize` argument from user and read in a text file via piping. One can use `>` carrot to write output messages to an out file:
 
 > elims $ cat Pricer/pricer.in  | python pricer.py --targetsize 200 > Pricer/elim200.out
 
-This option is the solution that the problem set
-asks for. It uses bash I/O pipe to due with in and
-out put text messages. First, `cat` read the input
-file as one line and is fed to the python script.
-The python script took the infile as standard input
-(stdin), as well as the input targetsize of 200. The
-out messages are `carroted` (>) to a dedicated output
-file `Pricer/elim200.out`.
+In short, the `pricer.py` initializes a `Book` instance, which keeps track of the standing bids and asks (see `Book.py`).
 
-Option 2
---------
+Resources
+---------
+
+Elim has also provided two scripts: `Resources/pricer.sh` and `Resources/pricer_python_standalone.py`.
+
+First, the bash script checks the correctness of my solution script. It assumes that the input file `pricer.in` is located in `Pricer/` folder. The bash script automatically runs all three target sizes (1, 200, 10k) and print out the number of lines that are different between Elim's anwser and standard anwser by Kinetica via `sdiff`. The command line to run `pricer.sh` is 
 
 > elims $ bash pricer.sh
 
+The output Elim got is
 >> target size 1 : differences between Elim and correct outputs = 0    
 >> target size 200 : differences between Elim and correct outputs = 0  
 >> target size 10000 : differences between Elim and correct outputs = 0 
 
-This option assumes that pricer.in is located in
-Pricer/. This bash script also automatically runs
-all three target sizes (1, 200, 10k) and print out
-(`echo`) the differences between Elim's anwser and
-standard anwser by Kinetica. The `sdiff` comparison
-serves as a simple test between my answer and the
-correct answer.
+This means that there are no differences between Elim's solution and the one provided by Kinetica. 
 
-Option 3
---------
+Second, a standalone python script `pricer_python_standalone.py` is also found in the `Resources/` folder. This script is the most original version by Elim that gives the correct logic (done by 09/03/2018). This script uses a python built-in `open ()` function instead of standard input (stdin) via piping. It also takes the `.gz` as the input file instead of `.in`. This script took about 7 min to run the entire input file `Pricer/pricer.in` with a target size of 200, whereas `pricer.py` via piping took about 3 min for the same inputs. To run this python script,
 
-> elims $python pricer_python_standalone.py --targetsize 200 --verbose 0 --maxrows -1 (--test if use test file)
+> elims $python pricer_python_standalone.py --targetsize 200 --verbose 0 --maxrows -1
 
-This is the most originated version that gives
-the correct logic (done by 09/03/2018). This
-script uses a python built-in `open ()` function
-instead of standard input (stdin) via bash and
-takes the .gz as the input file instead of .out.
-This version of `pricer.py` is the slowest
-(about 7 min) to run the entire Pricer/pricer.in,
-whereas Option 2 took about 3 min for the same input.
+Testing
+-------
+
+In addition, Elim wrote two unittests for `Book.py` and `pricer.py`. The test scripts are located in `test_scripts/`.

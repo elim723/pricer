@@ -46,12 +46,13 @@ verbose    = 0
 ###########################################
 ### function to process each line
 ###########################################
-def process (*data):
+def process (book, *data):
 
     ''' process a line of data
 
-        :param data (list): [timestamp, add, order, side, price, size] or
-                            [timestamp, reduce, order, size]
+        :param book (class `Book`): a given book
+        :param data (list)        : [timestamp, add, order, side, price, size] or
+                                    [timestamp, reduce, order, size]
 
         :return message (str): If None, income / expanses remain the same
                                If not None, income / expanses is/are updated
@@ -79,7 +80,7 @@ def process (*data):
         print_income, print_expanse = book.reduce_order (*args)
 
     ## get message (None if nothing is updated
-    message = get_message (data[0].decode ('utf-8'),
+    message = get_message (book, data[0].decode ('utf-8'),
                            print_S=print_income,
                            print_B=print_expanse)
     return message
@@ -87,13 +88,14 @@ def process (*data):
 ###########################################
 ### function to get message
 ###########################################
-def get_message (timestamp, print_S=False, print_B=False):
+def get_message (book, timestamp, print_S=False, print_B=False):
 
     ''' obtain message for output file if print_S or print_B
 
-        :param timestamp (str) : time when income/expanse is updated
-        :param print_S   (bool): If True, seller sells! Income is updated
-        :param print_B   (bool): If True, buyer buys! Expanse is updated
+        :param book      (class `Book`): a given book
+        :param timestamp (str)         : time when income/expanse is updated
+        :param print_S   (bool)        : If True, seller sells! Income is updated
+        :param print_B   (bool)        : If True, buyer buys! Expanse is updated
 
         :return message (str): message to be printed in output file
     '''
@@ -124,7 +126,7 @@ if __name__ == '__main__' :
     for line in sys.stdin:
         # get data from current line
         data = line.split (' ')
-        message = process (*data)
+        message = process (book, *data)
         
         # write message to new line if updated
         if message: print ('{0}'.format (message))
